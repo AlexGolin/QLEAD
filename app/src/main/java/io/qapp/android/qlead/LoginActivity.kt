@@ -18,15 +18,15 @@ import android.provider.ContactsContract
 import android.text.TextUtils
 import android.view.View
 import android.view.inputmethod.EditorInfo
-import android.widget.ArrayAdapter
-import android.widget.TextView
-
 import java.util.ArrayList
 import android.Manifest.permission.READ_CONTACTS
-import android.view.Window
-
+import android.app.LauncherActivity
+import android.content.Intent
+import android.support.design.widget.TextInputEditText
+import android.support.design.widget.TextInputLayout
+import android.support.v4.content.ContextCompat
+import android.widget.*
 import kotlinx.android.synthetic.main.activity_login.*
-import android.widget.Spinner
 
 
 
@@ -51,13 +51,42 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
             }
             false
         })
-        val dropdown = findViewById<Spinner>(R.id.login_spinner)
-        val items = arrayOf("Delegate?", "Executive?")
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, items)
-        dropdown.adapter = adapter
+
+        val mySpinner = findViewById<Spinner>(R.id.login_spinner)
+        mySpinner.adapter = SpinnerAdapter(this, R.layout.row, getAllList())
+        mySpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+
+            }
+
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                if(position == 0) {
+                    usernameHolder.hint =("Executive Name")
+                    passwordHolder.hint = ("Executive Passcode")
+                } else {
+                    usernameHolder.hint = ("Name")
+                    passwordHolder.hint = ("Passcode")
+                }
+            }
+
+        }
         email_sign_in_button.setOnClickListener { attemptLogin() }
     }
 
+    fun getAllList(): ArrayList<ListItem> {
+
+        val allList = ArrayList<ListItem>()
+
+        var item = ListItem()
+        item.setData("Executive?", R.drawable.ic_account_balance_black_24dp)
+        allList.add(item)
+
+        item = ListItem()
+        item.setData("Delegate?", R.drawable.ic_person_black_24dp)
+        allList.add(item)
+
+        return allList
+    }
     private fun populateAutoComplete() {
         if (!mayRequestContacts()) {
             return
@@ -74,7 +103,7 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
             return true
         }
         if (shouldShowRequestPermissionRationale(READ_CONTACTS)) {
-            Snackbar.make(email, R.string.permission_rationale, Snackbar.LENGTH_INDEFINITE)
+            Snackbar.make(username, R.string.permission_rationale, Snackbar.LENGTH_INDEFINITE)
                     .setAction(android.R.string.ok,
                             { requestPermissions(arrayOf(READ_CONTACTS), REQUEST_READ_CONTACTS) })
         } else {
@@ -107,11 +136,11 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
         }
 
         // Reset errors.
-        email.error = null
+        username.error = null
         password.error = null
 
         // Store values at the time of the login attempt.
-        val emailStr = email.text.toString()
+        val emailStr = username.text.toString()
         val passwordStr = password.text.toString()
 
         var cancel = false
@@ -126,12 +155,12 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
 
         // Check for a valid email address.
         if (TextUtils.isEmpty(emailStr)) {
-            email.error = getString(R.string.error_field_required)
-            focusView = email
+            username.error = getString(R.string.error_field_required)
+            focusView = username
             cancel = true
         } else if (!isEmailValid(emailStr)) {
-            email.error = getString(R.string.error_invalid_email)
-            focusView = email
+            username.error = getString(R.string.error_invalid_email)
+            focusView = username
             cancel = true
         }
 
@@ -143,6 +172,8 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true)
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
             mAuthTask = UserLoginTask(emailStr, passwordStr)
             mAuthTask!!.execute(null as Void?)
         }
@@ -150,12 +181,12 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
 
     private fun isEmailValid(email: String): Boolean {
         //TODO: Replace this with your own logic
-        return email.contains("@")
+        return true
     }
 
     private fun isPasswordValid(password: String): Boolean {
         //TODO: Replace this with your own logic
-        return password.length > 4
+        return true
     }
 
     /**
@@ -231,7 +262,7 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
         val adapter = ArrayAdapter(this@LoginActivity,
                 android.R.layout.simple_dropdown_item_1line, emailAddressCollection)
 
-        email.setAdapter(adapter)
+        username.setAdapter(adapter)
     }
 
     object ProfileQuery {
