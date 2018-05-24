@@ -60,7 +60,9 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
             }
 
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                if(position == 0) {
+                username.error = null
+                password.error = null
+                if(position == 1) {
                     usernameHolder.hint =("Executive Name")
                     passwordHolder.hint = ("Executive Passcode")
                 } else {
@@ -69,7 +71,7 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
                 }
             }
         }
-        mySpinner.setSelection(1) //I have no clue why this isn't index 0, but it works
+        mySpinner.setSelection(0)
         email_sign_in_button.setOnClickListener { attemptLogin() }
     }
 
@@ -146,7 +148,7 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
         var focusView: View? = null
 
         // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(passwordStr) && !isPasswordValid(passwordStr)) {
+        if (TextUtils.isEmpty(passwordStr) || !isPasswordValid(passwordStr)) {
             password.error = getString(R.string.error_invalid_password)
             focusView = password
             cancel = true
