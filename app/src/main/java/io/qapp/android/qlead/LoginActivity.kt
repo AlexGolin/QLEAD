@@ -68,8 +68,8 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
                     passwordHolder.hint = ("Passcode")
                 }
             }
-
         }
+        mySpinner.setSelection(1) //I have no clue why this isn't index 0, but it works
         email_sign_in_button.setOnClickListener { attemptLogin() }
     }
 
@@ -78,11 +78,10 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
         val allList = ArrayList<ListItem>()
 
         var item = ListItem()
-        item.setData("Executive?", R.drawable.ic_account_balance_black_24dp)
-        allList.add(item)
-
-        item = ListItem()
         item.setData("Delegate?", R.drawable.ic_person_black_24dp)
+        allList.add(item)
+        item = ListItem()
+        item.setData("Executive?", R.drawable.ic_account_balance_black_24dp)
         allList.add(item)
 
         return allList
